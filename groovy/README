@@ -1,0 +1,2 @@
+ParseEmailAlert.groovy   
+ it is used to export some data from database to csv file. depend on mysql-xx-xx.jar
