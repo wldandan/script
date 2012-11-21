@@ -27,13 +27,10 @@ outputDirectory=options.o?:"/jobs/email-alert"
 connectString = "jdbc:jtds:sqlserver://${hostName}:1433/${databaseName}"
 println connectString
 
-sqlForCollectSaveSearch='''
-select * from IMMOBILI WHERE CODICEANNUNCIO = '1486769'
-'''
-
 sqlUpdateListing='''
 select * from IMMOBILI WHERE CODICEANNUNCIO = '1486769'
-update IMMOBILI set DESCRIZIONE = 'test' where CODICEANNUNCIO = '1486769'
+update ListingsPersisted set DataOrdinamento=GETDATE()-3 where CODICEANNUNCIO =1486769
+update IMMOBILI set DATASCADENZA = getdate() + 13, INDIRIZZOVISIBILESULSITO = 0, PuntiUPdateDt = getdate(), FlgPrezzoVisibile = 0 where CODICEANNUNCIO =1486769
 '''
 
 

@@ -64,9 +64,12 @@ update email_alert set send_time = now();
 System.out.println ("[${new Date().getDateTimeString()}] update send email time!")
 System.out.println ("[${new Date().getDateTimeString()}] sending out email!")
 
-sql.eachRow(sqlCheckAlert, handleRow)
-while (exist){
-    sleep(1000)
-    sql.eachRow(sqlCheckAlert, handleRow)
-}
+//sql.eachRow(sqlCheckAlert, handleRow)
+//while (exist){
+//    sleep(1000)
+//    sql.eachRow(sqlCheckAlert, handleRow)
+//}
+sql.execute ''' 
+delete from recent_alerted_listing;
+'''
 System.out.println ("[${new Date().getDateTimeString()}] email alert has been sent!")
