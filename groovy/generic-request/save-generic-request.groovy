@@ -5,7 +5,7 @@ def log(msg) {
 }
 
 
-def cli = new CliBuilder(usage: 'ParseEmailAlert.groovy -[hndupo]')
+def cli = new CliBuilder(usage: 'Send generic request -[hndupo]')
 cli.with{
     h longOpt: 'help', 'the options usage'
     r longOpt: 'remove', 'remove saved searches'
@@ -23,7 +23,7 @@ if (options.h){
     return
 }
 
-hostName=options.n?: '10.47.12.20'
+hostName=options.n?: 'localhost'
 databaseName=options.d?options.d : 'rea'
 user=options.u?:'root'
 password=options.p?:''
@@ -35,8 +35,8 @@ println serverConn
 
 def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
 if (isDeleteOption) {
-    println "deleting all saved searches..."
-    sql.execute 'delete from saved_search where search_type="saved"'
+    println "deleting all generic request..."
+    sql.execute 'delete from saved_search where search_type="generic_request"'
     println "Finished."
     return
 }
@@ -48,20 +48,14 @@ row = sql.firstRow("SELECT VISITOR_UID FROM VISITOR WHERE VISITOR_LOGIN_ID=?", [
 visitor_uid=row.VISITOR_UID
 println "retrieving visitor id: ${visitor_uid} by ${email}"
 
-encode_properties='''
-{"listingType":"buy","resolvedSurroundingLocationCodes":"|IT-PUG-074007|","where":"Selva di Fasano, Fasano, BR, Puglia","resolvedLocations":"|Selva di Fasano, Fasano, BR, Puglia|","searchView":"list","resolvedLocationCodes":"|Z-31495|","userWhere":"selva di fasano, fasano br","channel":"buy","domain":"localhost","searchUrl":"/vendita-residenziale/in-selva+di+fasano%2c+fasano%2c+br%2c+puglia/lista-1"}
-'''
-search_type='saved'
-ntf_frequency='immediately'
-save_search_name='Selva di Fasano, FASANO BR'
+encode_properties='''{"category":"residenziale","resolvedLocationCodes":"|Z-31495|","preferredState":"pug","channel":"buy","resolvedSurroundingLocationCodes":"|Z-31495|","minHouseSize":"200","resolvedLocations":"|Selva di Fasano, Fasano, BR, Puglia|","where":"Selva di Fasano, Fasano, BR,Puglia","listingType":"buy","propertyType":"Castello","searchView":"list","minPrice":"500000","domain":"localhost","maxPrice":"1000000","maxHouseSize":"400","searchUrl":"/vendita-residenziale/immobile-castello-dimensione-200-400-per-500000-1000000-in-selva+di+fasano%2c+fasano%2c+br%2c+puglia/lista-1?preferredState=pug","firstName":"wang","lastName":"lei","email":"wang.lei@rea-group.com","telephone":"","message":""}'''
+search_type='generic_request'
+save_search_name='tmpgeneric_request'
 
-def params=[search_id,visitor_uid,search_type,save_search_name,encode_properties,ntf_frequency]
-params.each{
-  println "current item is ${it}"
-}
+def params=[search_id,visitor_uid,search_type,save_search_name,encode_properties]
 
-sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties,ntf_frequency) values (?, ?, ?, ?, ?, ?)', params
-
+sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties) values (?, ?, ?, ?, ?)', params
+println "save generic request successfully!"
 
 /*
 sqlAddSaveSearch='''
