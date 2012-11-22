@@ -8,6 +8,7 @@ def log(msg) {
 def cli = new CliBuilder(usage: 'ParseEmailAlert.groovy -[hndupo]')
 cli.with{
     h longOpt: 'help', 'the options usage'
+    r longOpt: 'remove', 'remove saved searches'
     n longOpt: 'database node', args: 1, argName: 'hostName', 'database node'
     d longOpt: 'database', args: 1, argName: 'databaseName', 'database name'
     u longOpt: 'user', args: 1, argName: 'user', 'the database user. root if not specified'
@@ -22,20 +23,25 @@ if (options.h){
     return
 }
 
-hostName=options.n?: 'localhost'
+hostName=options.n?: '10.47.12.20'
 databaseName=options.d?options.d : 'rea'
 user=options.u?:'root'
 password=options.p?:''
 email=options.m?:'wang.lei@rea-group.com'
+isDeleteOption=options.r?:false
 
 serverConn="jdbc:mysql://${hostName}:3306/${databaseName}"
 println serverConn
 
-
 def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
+if (isDeleteOption) {
+    println "deleting all saved searches..."
+    sql.execute 'delete from saved_search where search_type="saved"'
+    println "Finished."
+    return
+}
 row = sql.firstRow('SELECT UUID_SHORT() as id;')
 search_id=row.id
-
 println "generating uuid as save_search id: ${search_id}"
 
 row = sql.firstRow("SELECT VISITOR_UID FROM VISITOR WHERE VISITOR_LOGIN_ID=?", [email])

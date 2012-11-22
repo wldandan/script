@@ -22,7 +22,7 @@ if (options.h){
     return
 }
 
-hostName=options.n?: '172.20.55.229'
+hostName=options.n?:'172.20.55.229'
 databaseName=options.d?options.d : 'email_alert'
 user=options.u?:'root'
 password=options.p?:''
@@ -44,8 +44,9 @@ def handleRow={row ->
 }
 System.out.println ("[${new Date().getDateTimeString()}] waiting for email alert data to be injected!")
 
-
+System.out.println serverConn
 def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
+System.out.println sql
 sql.eachRow(sqlCheckAlert, handleRow)
 
 while (!exist){
