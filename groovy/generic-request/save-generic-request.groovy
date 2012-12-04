@@ -54,50 +54,6 @@ save_search_name='tmpgeneric_request'
 
 def params=[search_id,visitor_uid,search_type,save_search_name,encode_properties]
 
-sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties) values (?, ?, ?, ?, ?)', params
+sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties,usage_timestamp) values (?, ?, ?, ?, ?, now())', params
 println "save generic request successfully!"
 
-/*
-sqlAddSaveSearch='''
-select * from recent_alerted_listing where listing_id = '1486769'
-'''
-
-
-exist=false
-
-def handleRow={row ->
-    System.out.println(row.toRowResult())
-    exist = !row.toRowResult().isEmpty()
-}
-System.out.println ("[${new Date().getDateTimeString()}] waiting for email alert data to be injected!")
-
-
-def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
-sql.eachRow(sqlCheckAlert, handleRow)
-
-while (!exist){
-    sleep(1000)
-    sql.eachRow(sqlCheckAlert, handleRow)
-}
-
-sql.execute '''
-delete from recent_alerted_listing;
-'''
-System.out.println ("[${new Date().getDateTimeString()}] delete recent alert listing!")
-
-sql.execute '''
-update email_alert set send_time = now();
-'''
-System.out.println ("[${new Date().getDateTimeString()}] update send email time!")
-System.out.println ("[${new Date().getDateTimeString()}] sending out email!")
-
-//sql.eachRow(sqlCheckAlert, handleRow)
-//while (exist){
-//    sleep(1000)
-//    sql.eachRow(sqlCheckAlert, handleRow)
-//}
-sql.execute ''' 
-delete from recent_alerted_listing;
-'''
-System.out.println ("[${new Date().getDateTimeString()}] email alert has been sent!")
-*/
