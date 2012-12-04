@@ -12,7 +12,6 @@ cli.with{
     d longOpt: 'database', args: 1, argName: 'databaseName', 'database name'
     u longOpt: 'user', args: 1, argName: 'user', 'the database user. root if not specified'
     p longOpt: 'password', args: 1, argName: 'password', '''the database password. '' if not specified'''
-    o longOpt: 'outout directory', args: 1, argName: 'outputDirectory', 'the output directory'
 }
 
 def options = cli.parse(args)
@@ -26,7 +25,6 @@ hostName=options.n?:'172.20.55.229'
 databaseName=options.d?options.d : 'email_alert'
 user=options.u?:'root'
 password=options.p?:''
-outputDirectory=options.o?:"/jobs/email-alert"
 
 serverConn="jdbc:mysql://${hostName}:3306/email_alert"
 System.out.println serverConn
@@ -54,9 +52,7 @@ while (!exist){
     sql.eachRow(sqlCheckAlert, handleRow)
 }
 
-sql.execute '''
-delete from recent_alerted_listing;
-'''
+sql.execute '''delete from recent_alerted_listing;'''
 System.out.println ("[${new Date().getDateTimeString()}] delete recent alert listing!")
 
 sql.execute '''
@@ -65,12 +61,5 @@ update email_alert set send_time = now();
 System.out.println ("[${new Date().getDateTimeString()}] update send email time!")
 System.out.println ("[${new Date().getDateTimeString()}] sending out email!")
 
-//sql.eachRow(sqlCheckAlert, handleRow)
-//while (exist){
-//    sleep(1000)
-//    sql.eachRow(sqlCheckAlert, handleRow)
-//}
-sql.execute ''' 
-delete from recent_alerted_listing;
-'''
+sql.execute '''delete from recent_alerted_listing;'''
 System.out.println ("[${new Date().getDateTimeString()}] email alert has been sent!")

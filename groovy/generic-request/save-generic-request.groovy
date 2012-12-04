@@ -31,7 +31,7 @@ email=options.m?:'wang.lei@rea-group.com'
 isDeleteOption=options.r?:false
 
 serverConn="jdbc:mysql://${hostName}:3306/${databaseName}"
-println serverConn
+println "connecting the server ${serverConn}"
 
 def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
 if (isDeleteOption) {

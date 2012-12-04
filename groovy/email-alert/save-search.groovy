@@ -23,7 +23,7 @@ if (options.h){
     return
 }
 
-hostName=options.n?: '10.47.12.20'
+hostName=options.n?: 'localhost'
 databaseName=options.d?options.d : 'rea'
 user=options.u?:'root'
 password=options.p?:''
@@ -34,76 +34,32 @@ serverConn="jdbc:mysql://${hostName}:3306/${databaseName}"
 println serverConn
 
 def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
-if (isDeleteOption) {
-    println "deleting all saved searches..."
-    sql.execute 'delete from saved_search where search_type="saved"'
-    println "Finished."
-    return
-}
-row = sql.firstRow('SELECT UUID_SHORT() as id;')
-search_id=row.id
-println "generating uuid as save_search id: ${search_id}"
 
 row = sql.firstRow("SELECT VISITOR_UID FROM VISITOR WHERE VISITOR_LOGIN_ID=?", [email])
 visitor_uid=row.VISITOR_UID
 println "retrieving visitor id: ${visitor_uid} by ${email}"
 
-encode_properties='''
-{"listingType":"buy","resolvedSurroundingLocationCodes":"|IT-PUG-074007|","where":"Selva di Fasano, Fasano, BR, Puglia","resolvedLocations":"|Selva di Fasano, Fasano, BR, Puglia|","searchView":"list","resolvedLocationCodes":"|Z-31495|","userWhere":"selva di fasano, fasano br","channel":"buy","domain":"localhost","searchUrl":"/vendita-residenziale/in-selva+di+fasano%2c+fasano%2c+br%2c+puglia/lista-1"}
-'''
+if (isDeleteOption) {
+    println "deleting all saved searches..."
+    sql.execute "delete from saved_search where search_type='saved' and visitor_uid=${visitor_uid}"
+    println "Clean up all email alert for current user ${email}"
+    return
+}
+
+println "waiting for generating uuid as save_search id"
+row = sql.firstRow('SELECT UUID_SHORT() as id;')
+search_id=row.id
+println "generating uuid as save_search id: ${search_id}"
+
+
+encode_properties='''{"listingType":"buy","category":"residenziale","propertyType":"Castello","searchView":"list","resolvedLocationCodes":"|Z-31495|","preferredState":"pug","minPrice":"500000","channel":"buy","domain":"localhost","resolvedSurroundingLocationCodes":"|Z-31495|","maxPrice":"1000000","minHouseSize":"200","where":"Selva di Fasano, Fasano, BR, Puglia","resolvedLocations":"|Selva di Fasano, Fasano, BR, Puglia|","maxHouseSize":"400","searchUrl":"/vendita-residenziale/immobile-castello-dimensione-200-400-per-500000-1000000-in-selva+di+fasano%2c+fasano%2c+br%2c+puglia/lista-1?preferredState=pug"}'''
 search_type='saved'
+
 ntf_frequency='immediately'
+println "the email frequency is ${ntf_frequency}"
+
 save_search_name='Selva di Fasano, FASANO BR'
 
 def params=[search_id,visitor_uid,search_type,save_search_name,encode_properties,ntf_frequency]
-params.each{
-  println "current item is ${it}"
-}
 
-sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties,ntf_frequency) values (?, ?, ?, ?, ?, ?)', params
-
-
-/*
-sqlAddSaveSearch='''
-select * from recent_alerted_listing where listing_id = '1486769'
-'''
-
-
-exist=false
-
-def handleRow={row ->
-    System.out.println(row.toRowResult())
-    exist = !row.toRowResult().isEmpty()
-}
-System.out.println ("[${new Date().getDateTimeString()}] waiting for email alert data to be injected!")
-
-
-def sql = Sql.newInstance(serverConn, "${user}", "${password}", 'com.mysql.jdbc.Driver')
-sql.eachRow(sqlCheckAlert, handleRow)
-
-while (!exist){
-    sleep(1000)
-    sql.eachRow(sqlCheckAlert, handleRow)
-}
-
-sql.execute '''
-delete from recent_alerted_listing;
-'''
-System.out.println ("[${new Date().getDateTimeString()}] delete recent alert listing!")
-
-sql.execute '''
-update email_alert set send_time = now();
-'''
-System.out.println ("[${new Date().getDateTimeString()}] update send email time!")
-System.out.println ("[${new Date().getDateTimeString()}] sending out email!")
-
-//sql.eachRow(sqlCheckAlert, handleRow)
-//while (exist){
-//    sleep(1000)
-//    sql.eachRow(sqlCheckAlert, handleRow)
-//}
-sql.execute ''' 
-delete from recent_alerted_listing;
-'''
-System.out.println ("[${new Date().getDateTimeString()}] email alert has been sent!")
-*/
+sql.execute 'insert into saved_search(search_id,visitor_uid,search_type,name,encoded_properties,ntf_frequency,usage_timestamp) values (?, ?, ?, ?, ?, ?,now())', params

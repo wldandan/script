@@ -5,4 +5,4 @@
 # jetwire-casa.casa-cloud - 172.20.52.52
 # casa-main.casa-cloud - 172.20.49.159
 
-groovy -cp mysql-connector-java-5.1.10.jar save-generic-request.groovy 
+groovy -cp mysql-connector-java-5.1.10.jar save-generic-request.groovy -n 172.20.49.159 -u root -p s3cr3t  -m longkai.cao@rea-group.com  
