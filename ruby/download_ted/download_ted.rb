@@ -50,7 +50,6 @@ def main dest
     download_mp4 url,ted_url,ted_dir
     puts "#{dest}/#{ted_dir}"
     parseContent "#{dest}/#{ted_dir}"
-    return
   end
 end
 
