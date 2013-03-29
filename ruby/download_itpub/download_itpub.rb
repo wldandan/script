@@ -5,8 +5,8 @@ require 'json'
 baseurl=ARGV[0]
 puts baseurl
 doc=Nokogiri::HTML(open(baseurl))
-parse_rule = "ignore_js_op span a"
-#parse_rule = ignore_js_op a
+#parse_rule = "ignore_js_op span a"
+parse_rule = "ignore_js_op a"
 links = doc.css(parse_rule).each do |item|
   relative_url = item['href']
   title=item.inner_text
