@@ -19,12 +19,12 @@ if (options.h){
 }
 
 hostName=options.n?: 'localhost'
-databaseName=options.d?options.d : 'rea'
+databaseName=options.d?options.d : 'test'
 user=options.u?:'root'
 password=options.p?:''
-outputDirectory=options.o?:"/jobs/email-alert"
+outputDirectory=options.o?:"/jobs/test"
 
-connectString = "jdbc:mysql://${hostName}:3306/rea"
+connectString = "jdbc:mysql://${hostName}:3306/test"
 println connectString
 
 sqlForCollectSaveSearch='''

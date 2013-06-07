@@ -7,7 +7,7 @@ startSimpleHTTPServer(){
 case $1 in
     'start')
           path=$(pwd)
-          cd ${path}/eas-json
+          cd ${path}/json
           port=$2
           startSimpleHTTPServer
           if [ $?==0 ]; then
