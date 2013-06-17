@@ -26,17 +26,16 @@ def process_mp4 (item, base_dir, base_url, dest)
     title=item['talkDate']+' ' + item['speaker']
     title.gsub!(' ','_')
     title.gsub!("'",'_')
-
     url=base_url+item['talkLink']
-
     ted_doc=Nokogiri::HTML(open(url)) 
     ted_url=ted_doc.css('#no-flash-video-download')[0]['href']
-
+    ted_url.gsub!("?apikey=TEDDOWNLOAD",'')
+    puts "Downloading #{ted_url}"
     ted_dir="#{base_dir}/#{title}"
 
     download_mp4 url,ted_url,ted_dir
     puts "#{dest}/#{ted_dir}"
-    parseContent "#{dest}/#{ted_dir}"  
+    parseContent "#{dest}/#{ted_dir}"
 end  
 
 def main dest
